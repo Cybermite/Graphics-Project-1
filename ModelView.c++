@@ -13,12 +13,15 @@ GLint ModelView::ppuLoc_colorMode = -2; // uniform variable (per-primitive)
 GLint ModelView::ppuLoc_scaleTrans = -2;
 GLint ModelView::pvaLoc_mcPosition = -2; // attribute variable (per-vertex)
 GLint ModelView::ppuLoc_mvBounds = -2;
+GLint ModelView::ppuLoc_mvColor = -2;
+GLint ModelView::ppuLoc_mvNumOfCircles = -2;
 
 double ModelView::mcRegionOfInterest[6] = { -1.0, 1.0, -1.0, 1.0, -1.0, 1.0 };
 
 static const int numVertices = 4;
 
-ModelView::ModelView(vec2* vertices) : colorMode(8), visible(true)
+ModelView::ModelView(vec2* vertices, int numberOfCircles, vec4 color) 
+    : colorMode(8), visible(true), numberOfCircles(numberOfCircles)
 {
 	if (ModelView::shaderProgram == 0)
 	{
@@ -28,6 +31,7 @@ ModelView::ModelView(vec2* vertices) : colorMode(8), visible(true)
 		fetchGLSLVariableLocations();
 	}
 
+    setColor(color);
     defineGeometry(vertices);
 	ModelView::numInstances++;
 }
@@ -52,6 +56,14 @@ void ModelView::deleteObject()
 		glDeleteVertexArrays(1, vao);
 		vao[0] = vbo[0] = 0;
 	}
+}
+
+void ModelView::setColor(vec4 color)
+{
+    for(int i = 0; i < 4; i++)
+    {
+        mvColor[i] = color[i];
+    }
 }
 
 // computeScaleTrans determines the current model coordinate region of
@@ -110,7 +122,9 @@ void ModelView::fetchGLSLVariableLocations()
 		ModelView::ppuLoc_scaleTrans = ppUniformLocation(shaderProgram, "scaleTrans");
 		ModelView::pvaLoc_mcPosition = pvAttribLocation(shaderProgram, "mcPosition");
 	    ModelView::ppuLoc_mvBounds = ppUniformLocation(shaderProgram, "mvBounds");
-	}
+        ModelView::ppuLoc_mvColor = ppUniformLocation(shaderProgram, "mvColor");
+        ModelView::ppuLoc_mvNumOfCircles = ppUniformLocation(shaderProgram, "numberOfCircles");
+    }
 }
 
 // xyzLimits: {mcXmin, mcXmax, mcYmin, mcYmax, mcZmin, mcZmax}
@@ -172,6 +186,8 @@ void ModelView::render() const
 	
 	// pass in "2" because there is 2 vec2's
 	glUniform2fv(ModelView::ppuLoc_mvBounds, 2, mvBounds[0]);
+    glUniform4fv(ModelView::ppuLoc_mvColor, 1, mvColor);
+    glUniform1i(ModelView::ppuLoc_mvNumOfCircles, numberOfCircles);
 
 	// establish the current color mode and draw
 	glUniform1i(ModelView::ppuLoc_colorMode, colorMode);
