@@ -1,13 +1,10 @@
 #version 410 core
 
 in float ldsX, ldsY; // Logical Device Space: -1 <= lds_ <= +1
-in vec2 mvMaxBoundsToFS;
-in vec2 mvMinBoundsToFS;
 in vec2 mcPositionToFS;
+in vec2 relativePosToFS;
 in vec4 mvColorToFS;
 uniform int colorMode;
-//uniform vec2 mvBounds[2];
-//uniform vec4 mvColor;
 uniform int numberOfCircles;
 
 // Replace the placeholder implementation here...
@@ -18,18 +15,34 @@ out vec4 fragmentColor;
 #define circleRadiusPercent 0.25
 #define PI 3.1415926535
 
+void factorOfColor(int circleCount, int numberOfCircles)
+{
+    fragmentColor = mvColorToFS*circleCount/float(numberOfCircles);
+}
+
+void preDefinedColors(int circleCount, int numberOfCircles)
+{
+    vec4 colors[4];
+    colors[0] = vec4(0.0, 1.0, 0.0, 1.0);
+    colors[1] = vec4(0.0, 0.0, 1.0, 1.0);
+    colors[2] = vec4(0.5, 0.5, 0.5, 1.0);
+    colors[3] = vec4(0.7, 0.7, 0.7, 1.0);
+    
+    fragmentColor = colors[circleCount%4];
+}
+
 void main()
 {
-    vec2 center = (mvMinBoundsToFS + mvMaxBoundsToFS)/2.0;
+    vec2 center = vec2(0.0, 0.0);
     vec2 origCenter = center;
     vec2 ldsVec2 = vec2( ldsX, ldsY );
-    float radius = circleRadiusPercent*distance(mvMinBoundsToFS, mvMaxBoundsToFS)/(2.0);
-    unsigned int circleCount = 0;
+    float radius = 0.3;
+    int circleCount = 0;
     float radians = 0;
 
     for(int i = 0; i <= numberOfCircles; i++)
     {
-        if(distance(center, mcPositionToFS) <= radius)
+        if(distance(center, relativePosToFS) <= radius)
         {
             circleCount++;
         }
@@ -38,33 +51,22 @@ void main()
         radians = radians + (2.0*PI/float(numberOfCircles));
     }
 
-    /*
-    switch(circleCount)
-    {
-        case 1:
-            fragmentColor = vec4(0.0, 1.0, 0.0, 1.0);
-            break;
-        case 2:
-            fragmentColor = vec4(0.0, 0.0, 1.0, 1.0);
-            break;
-        case 3:
-            fragmentColor = vec4(0.5, 0.5, 0.5, 1.0);
-            break;
-        case 4:
-            fragmentColor = vec4(0.7, 0.7, 0.7, 1.0);
-            break;
-        default:
-            fragmentColor = vec4(1.0, 0.0, 0.0, 1.0);
-            break;
-    }*/
-
     if(circleCount == 0)
     {
+        //color background
         fragmentColor = vec4(1.0, 0.0, 0.0, 1.0);       
     }
+    
     else
     {
-        fragmentColor = mvColorToFS*circleCount/float(numberOfCircles);
+        switch(colorMode){
+            case 0:
+                factorOfColor(circleCount, numberOfCircles);
+                break;
+            case 1:
+                preDefinedColors(circleCount, numberOfCircles);
+                break;
+        }
     }
 }
 

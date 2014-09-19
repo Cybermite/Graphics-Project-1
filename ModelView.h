@@ -55,6 +55,7 @@ private:
     static GLint pvaLoc_mvMinBounds;
     static GLint pvaLoc_mvColor; // color to be used when coloring the circles
     static GLint ppuLoc_mvNumOfCircles;
+    static GLint pvaLoc_relPosition;
 
 	// "pp": "per-primitive"; "pv": "per-vertex"
 	static GLint ppUniformLocation(GLuint glslProgram, const std::string& name);
