@@ -3,12 +3,14 @@
 in vec2 mcPosition; // vertex position; "mc" stands for "model coordinates"
 in vec2 mvMaxBounds;
 in vec2 mvMinBounds;
+in vec4 mvColor;
 uniform vec4 scaleTrans; // for mapping coordinates into Logical Device Space
 
 out float ldsX, ldsY;
 out vec2 mcPositionToFS;
 out vec2 mvMinBoundsToFS;
 out vec2 mvMaxBoundsToFS;
+out vec4 mvColorToFS;
 
 // replace the placeholder implementation here
 
@@ -19,6 +21,7 @@ void main()
 	mcPositionToFS = mcPosition;
 	mvMinBoundsToFS = mvMinBounds;
 	mvMaxBoundsToFS = mvMaxBounds;
+    mvColorToFS = mvColor;
 	gl_Position = vec4(ldsX, ldsY, 0, 1);
 }
 

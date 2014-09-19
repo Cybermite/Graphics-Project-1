@@ -53,7 +53,7 @@ private:
 	static GLint pvaLoc_mcPosition; // an attribute variable (per-vertex)
     static GLint pvaLoc_mvMaxBounds; // the bounds of this model.
     static GLint pvaLoc_mvMinBounds;
-    static GLint ppuLoc_mvColor; // color to be used when coloring the circles
+    static GLint pvaLoc_mvColor; // color to be used when coloring the circles
     static GLint ppuLoc_mvNumOfCircles;
 
 	// "pp": "per-primitive"; "pv": "per-vertex"

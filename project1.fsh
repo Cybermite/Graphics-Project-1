@@ -4,9 +4,10 @@ in float ldsX, ldsY; // Logical Device Space: -1 <= lds_ <= +1
 in vec2 mvMaxBoundsToFS;
 in vec2 mvMinBoundsToFS;
 in vec2 mcPositionToFS;
+in vec4 mvColorToFS;
 uniform int colorMode;
 //uniform vec2 mvBounds[2];
-uniform vec4 mvColor;
+//uniform vec4 mvColor;
 uniform int numberOfCircles;
 
 // Replace the placeholder implementation here...
@@ -63,7 +64,7 @@ void main()
     }
     else
     {
-        fragmentColor = mvColor*circleCount/float(numberOfCircles);
+        fragmentColor = mvColorToFS*circleCount/float(numberOfCircles);
     }
 }
 
