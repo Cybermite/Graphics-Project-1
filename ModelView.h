@@ -32,7 +32,7 @@ public:
 
 private:
 	GLuint vao[1]; // VAO for the triangle
-	GLuint vbo[1]; // VBO for the triangle coordinates
+	GLuint vbo[3]; // VBO - 0 for position, 1 for model view maxBounds, 2 for model view minBounds, and 3 for color
     vec4 mvColor;
     int numberOfCircles;
 	
@@ -51,7 +51,8 @@ private:
 	static GLint ppuLoc_colorMode; // a uniform variable (per-primitive)
 	static GLint ppuLoc_scaleTrans; // a uniform used to scale MC to LDS
 	static GLint pvaLoc_mcPosition; // an attribute variable (per-vertex)
-    static GLint ppuLoc_mvBounds; // the bounds of this model.
+    static GLint pvaLoc_mvMaxBounds; // the bounds of this model.
+    static GLint pvaLoc_mvMinBounds;
     static GLint ppuLoc_mvColor; // color to be used when coloring the circles
     static GLint ppuLoc_mvNumOfCircles;
 
