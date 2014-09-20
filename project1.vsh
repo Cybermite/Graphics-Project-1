@@ -15,10 +15,10 @@ out vec2 relativePosToFS;
 
 void main()
 {
-	ldsX = scaleTrans[0]*mcPosition.x + scaleTrans[1];
-	ldsY = scaleTrans[2]*mcPosition.y + scaleTrans[3];
+    ldsX = scaleTrans[0]*mcPosition.x + scaleTrans[1];
+    ldsY = scaleTrans[2]*mcPosition.y + scaleTrans[3];
     mcPositionToFS = mcPosition;
     relativePosToFS = relativePos;
-	gl_Position = vec4(ldsX, ldsY, 0, 1);
+    gl_Position = vec4(ldsX, ldsY, 0, 1);
 }
 

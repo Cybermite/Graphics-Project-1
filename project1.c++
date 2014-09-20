@@ -9,8 +9,8 @@
 int main(int argc, char* argv[])
 {
     // define vertex coordinates for each box
-	vec2 vertexPositions[][4] =
-	{
+    vec2 vertexPositions[][4] =
+    {
         { {-12, 5 }, { -1, 5 }, {-12, 16}, { -1, 16} },
         { { -7, 16}, { -5, 18}, { -9, 18}, { -7, 20} },
         { {  6, 3 }, { 10, 3 }, {  6, 7 }, { 10, 7 } },
@@ -36,19 +36,19 @@ int main(int argc, char* argv[])
             { 0.7, 0.9, 0.2, 1.0 }, { 0.9, 0.5, 1.0, 1.0 } }
     };
 
-	GLFWController c(argv[0]);
-	c.reportVersions(std::cout);
+    GLFWController c(argv[0]);
+    c.reportVersions(std::cout);
 
     for(int i = 0; i < 6; i++)
     {
         c.addModel( new ModelView(vertexPositions[i], colors[i] ) );
     }
-	
-	double xyz[6]; // xyz limits
-	c.getOverallMCBoundingBox(xyz);
-	ModelView::setMCRegionOfInterest(xyz);
+    
+    double xyz[6]; // xyz limits
+    c.getOverallMCBoundingBox(xyz);
+    ModelView::setMCRegionOfInterest(xyz);
 
-	c.run();
+    c.run();
 
-	return 0;
+    return 0;
 }
