@@ -8,7 +8,6 @@ uniform vec4 scaleTrans; // for mapping coordinates into Logical Device Space
 out float ldsX, ldsY;
 out vec2 mcPositionToFS;
 out vec2 relativePosToFS;
-out vec4 mvColorToFS;
 
 // replace the placeholder implementation here
 
@@ -18,7 +17,6 @@ void main()
 	ldsY = scaleTrans[2]*mcPosition.y + scaleTrans[3];
     mcPositionToFS = mcPosition;
     relativePosToFS = relativePos;
-    mvColorToFS = mvColor;
 	gl_Position = vec4(ldsX, ldsY, 0, 1);
 }
 

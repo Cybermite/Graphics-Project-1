@@ -20,7 +20,7 @@ typedef float vec4[4];
 class ModelView
 {
 public:
-	ModelView(vec2* vertices, int numberOfCircles, vec4 color);
+	ModelView(vec2* vertices, vec4 color[]);
 	virtual ~ModelView();
 
 	// xyzLimits: {mcXmin, mcXmax, mcYmin, mcYmax, mcZmin, mcZmax}
@@ -33,8 +33,7 @@ public:
 private:
 	GLuint vao[1]; // VAO for the triangle
 	GLuint vbo[3]; // VBO - 0 for position, 1 for model view maxBounds, 2 for model view minBounds, and 3 for color
-    vec4 mvColor;
-    int numberOfCircles;
+    vec4* mvColor;
 	
 	// interactive display options
 	int colorMode; // flag to tell fragment shader how to assign colors
@@ -51,11 +50,8 @@ private:
 	static GLint ppuLoc_colorMode; // a uniform variable (per-primitive)
 	static GLint ppuLoc_scaleTrans; // a uniform used to scale MC to LDS
 	static GLint pvaLoc_mcPosition; // an attribute variable (per-vertex)
-    static GLint pvaLoc_mvMaxBounds; // the bounds of this model.
-    static GLint pvaLoc_mvMinBounds;
-    static GLint pvaLoc_mvColor; // color to be used when coloring the circles
-    static GLint ppuLoc_mvNumOfCircles;
-    static GLint pvaLoc_relPosition;
+    static GLint ppuLoc_mvColor; // color to be used when coloring the circles
+    static GLint pvaLoc_relPosition; // will be used for the local coord system for our model
 
 	// "pp": "per-primitive"; "pv": "per-vertex"
 	static GLint ppUniformLocation(GLuint glslProgram, const std::string& name);
@@ -80,7 +76,7 @@ private:
 	
 	void defineGeometry(vec2* vertices);
 	void deleteObject();
-    void setColor(vec4 color);
+    void setColors(vec4 colors[]);
 };
 
 #endif

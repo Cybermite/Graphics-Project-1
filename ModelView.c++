@@ -12,18 +12,14 @@ GLuint ModelView::shaderProgram = 0;
 GLint ModelView::ppuLoc_colorMode = -2; // uniform variable (per-primitive)
 GLint ModelView::ppuLoc_scaleTrans = -2;
 GLint ModelView::pvaLoc_mcPosition = -2; // attribute variable (per-vertex)
-GLint ModelView::pvaLoc_mvMinBounds = -2; //x, y maxs for this model view
-GLint ModelView::pvaLoc_mvMaxBounds = -2; //x, y mins for this model view
-GLint ModelView::pvaLoc_mvColor = -2; 
-GLint ModelView::ppuLoc_mvNumOfCircles = -2;
+GLint ModelView::ppuLoc_mvColor = -2; 
 GLint ModelView::pvaLoc_relPosition = -2;
 
 double ModelView::mcRegionOfInterest[6] = { -1.0, 1.0, -1.0, 1.0, -1.0, 1.0 };
 
 static const int numVertices = 4;
 
-ModelView::ModelView(vec2* vertices, int numberOfCircles, vec4 color) 
-    : colorMode(0), visible(true), numberOfCircles(numberOfCircles)
+ModelView::ModelView(vec2* vertices, vec4 colors[]) : colorMode(0)
 {
 	if (ModelView::shaderProgram == 0)
 	{
@@ -33,7 +29,7 @@ ModelView::ModelView(vec2* vertices, int numberOfCircles, vec4 color)
 		fetchGLSLVariableLocations();
 	}
 
-    setColor(color);
+    setColors(colors);
     defineGeometry(vertices);
 	ModelView::numInstances++;
 }
@@ -60,12 +56,9 @@ void ModelView::deleteObject()
 	}
 }
 
-void ModelView::setColor(vec4 color)
+void ModelView::setColors(vec4 colors[])
 {
-    for(int i = 0; i < 4; i++)
-    {
-        mvColor[i] = color[i];
-    }
+    mvColor = colors;
 }
 
 // computeScaleTrans determines the current model coordinate region of
@@ -123,10 +116,7 @@ void ModelView::fetchGLSLVariableLocations()
 		ModelView::ppuLoc_colorMode = ppUniformLocation(shaderProgram, "colorMode");
 		ModelView::ppuLoc_scaleTrans = ppUniformLocation(shaderProgram, "scaleTrans");
 		ModelView::pvaLoc_mcPosition = pvAttribLocation(shaderProgram, "mcPosition");
-//	    ModelView::pvaLoc_mvMinBounds = pvAttribLocation(shaderProgram, "mvMinBounds");
-//	    ModelView::pvaLoc_mvMaxBounds = pvAttribLocation(shaderProgram, "mvMaxBounds");
-        ModelView::pvaLoc_mvColor = pvAttribLocation(shaderProgram, "mvColor");
-        ModelView::ppuLoc_mvNumOfCircles = ppUniformLocation(shaderProgram, "numberOfCircles");
+        ModelView::ppuLoc_mvColor = ppUniformLocation(shaderProgram, "userColors");
         ModelView::pvaLoc_relPosition = pvAttribLocation(shaderProgram, "relativePos");
     }
 }
@@ -146,9 +136,14 @@ void ModelView::handleCommand(unsigned char key, double ldsX, double ldsY)
     computeScaleTrans(scaleTrans);
     float mcX = (ldsX - scaleTrans[1])/(scaleTrans[0]);
     float mcY = (ldsY - scaleTrans[3])/(scaleTrans[2]);
+    
+    // if this is the correct modelview
     if((mcX > xmin) && (mcX < xmax) && (mcY > ymin) && (mcY < ymax))
     {
-        colorMode = (colorMode + 1) % 3;
+        if(key == 'c')
+        {
+            colorMode = (colorMode + 1) % 3;
+        }
     }
 }
 
@@ -179,11 +174,7 @@ GLint ModelView::pvAttribLocation(GLuint glslProgram, const std::string& name)
 }
 
 void ModelView::render() const
-{
-    if ((vao[0] == 0)  || // if it has been deleted
-	    (!visible))    // if it has been temporarily blanked
-		return;    
-    
+{    
 	// save the current GLSL program in use
 	GLint pgm;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &pgm);
@@ -192,16 +183,13 @@ void ModelView::render() const
 	glUseProgram(shaderProgram);
 
 	float scaleTrans[4];
-	//vec2 mvBounds[2] = { { xmin, ymin }, { xmax, ymax } };
 	computeScaleTrans(scaleTrans);
 	glUniform4fv(ModelView::ppuLoc_scaleTrans, 1, scaleTrans);
-	
-	// pass in "2" because there is 2 vec2's
-	//glUniform2fv(ModelView::ppuLoc_mvBounds, 2, mvBounds[0]);
-    //glUniform4fv(ModelView::ppuLoc_mvColor, 1, mvColor);
-    glUniform1i(ModelView::ppuLoc_mvNumOfCircles, numberOfCircles);
 
-	// establish the current color mode and draw
+    // set the color of the circles
+    glUniform4fv(ModelView::ppuLoc_mvColor, 5, mvColor[0]);
+	
+    // set the currect color mode
 	glUniform1i(ModelView::ppuLoc_colorMode, colorMode);
 
 	// bind the current triangle VAO
@@ -209,23 +197,8 @@ void ModelView::render() const
 
 	// Draw the box.
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	/*
-	vec2 mvMaxBounds[4] = { {xmax, ymax}, {xmax, ymax}, {xmax, ymax}, {xmax, ymax} };
-	vec2 mvMinBounds[4] = { {xmin, ymin}, {xmin, ymin}, {xmin, ymin}, {xmin, ymin} };
 	
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
-	int numBytesInBuffer = numVertices * sizeof(vec2);
-	glBufferData(GL_ARRAY_BUFFER, numBytesInBuffer, mvMaxBounds, GL_STATIC_DRAW);
-	glVertexAttribPointer(ModelView::pvaLoc_mvMaxBounds, 2, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(ModelView::pvaLoc_mvMaxBounds);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[2]);
-	//int numBytesInBuffer = numVertices * sizeof(vec2);
-	glBufferData(GL_ARRAY_BUFFER, numBytesInBuffer, mvMinBounds, GL_STATIC_DRAW);
-	glVertexAttribPointer(ModelView::pvaLoc_mvMinBounds, 2, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(ModelView::pvaLoc_mvMinBounds);
-*/
-	// restore the previous program
+    // restore the previous program
 	glUseProgram(pgm);
 }
 
@@ -252,19 +225,12 @@ void ModelView::defineGeometry(vec2* vertices) // num of vertices is a class var
 			ymax = vertices[i][1];
 	}
 	
-	// the size of 4 is for each vertex
-    vec4 mvColors[4] = { {mvColor[0], mvColor[1], mvColor[2], mvColor[3]},
-                         {mvColor[0], mvColor[1], mvColor[2], mvColor[3]},
-                         {mvColor[0], mvColor[1], mvColor[2], mvColor[3]},
-                         {mvColor[0], mvColor[1], mvColor[2], mvColor[3]} 
-                       };
-    
     // I assume vertices are coming in as bottom left, bottom right, top left,
     // top right.
     vec2 relPosition[4] = { { -1.0, -1.0 }, { 1.0, -1.0 }, { -1.0, 1.0 }, { 1.0, 1.0 } };
 
 	glGenVertexArrays(1, vao);
-	glGenBuffers(3, vbo); // 0 for position, 1 for model view max bounds, 2 for model view min bounds, and 3 for color
+	glGenBuffers(2, vbo); // 0 for position, and 2 for local coord system 
 	
 	glBindVertexArray(vao[0]);
 	
@@ -281,11 +247,4 @@ void ModelView::defineGeometry(vec2* vertices) // num of vertices is a class var
 	glVertexAttribPointer(ModelView::pvaLoc_relPosition, 2, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(ModelView::pvaLoc_relPosition);
 	
-    // Allocate and send data to GPU (model view color)
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[2]);
-	int numBytesInBuffer_Color = numVertices * sizeof(vec4);
-	glBufferData(GL_ARRAY_BUFFER, numBytesInBuffer_Color, mvColors, GL_STATIC_DRAW);
-	glVertexAttribPointer(ModelView::pvaLoc_mvColor, 4, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(ModelView::pvaLoc_mvColor);
- 
 }
