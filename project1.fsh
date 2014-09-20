@@ -64,6 +64,18 @@ void main()
                 circleCount++;
             }
         }
+
+        // used for 12 around 1
+        if(colorMode == 3)
+        {
+            if(distance(center*2, relativePosToFS) <= radius)
+            {
+                if(disableCircle[i] < 1)
+                {
+                    circleCount++;
+                }
+            }
+        }
         
         center = vec2(origCenter.x + cos(radians)*radius, origCenter.y + sin(radians)*radius);
         radians = radians + (2.0*PI/float(numberOfCirclesAround));
@@ -78,6 +90,9 @@ void main()
             break;
         case 2:
             preDefinedColors(circleCount);
+            break;
+        case 3:
+            userDefinedColors(circleCount);
             break;
     }
 }

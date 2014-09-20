@@ -146,7 +146,7 @@ void ModelView::handleCommand(unsigned char key, double ldsX, double ldsY)
     if((mcX > xmin) && (mcX < xmax) && (mcY > ymin) && (mcY < ymax))
     {
         if(key == 'c')
-            colorMode = (colorMode + 1) % 3;
+            colorMode = (colorMode + 1) % 4;
         else if(key == '0')
             disableCircle[0] = (disableCircle[0] + 1) % 2;
         else if(key == '1')
