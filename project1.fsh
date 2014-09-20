@@ -1,17 +1,20 @@
+// AUTHOR: ZANE RALSTON
+// DATE: SEPTEMBER 19, 2014
+// EMAIL: z641r311@ku.edu
+
 #version 410 core
 
 in vec2 mcPositionToFS;
 in vec2 relativePosToFS;
 uniform int colorMode;
 uniform vec4 userColors[5];
-uniform int disableCircle[7];
+uniform int disableCircle[13];
 
 // Replace the placeholder implementation here...
 
 out vec4 fragmentColor;
 
 #define numberOfCirclesAround 6
-#define circleRadiusPercent 0.25
 #define PI 3.1415926535
 
 void factorOfColor(int circleCount)
@@ -68,12 +71,9 @@ void main()
         // used for 12 around 1
         if(colorMode == 3)
         {
-            if(distance(center*2, relativePosToFS) <= radius)
+            if(distance(center*2, relativePosToFS) <= radius && i != 0)
             {
-                if(disableCircle[i] < 1)
-                {
-                    circleCount++;
-                }
+                circleCount++;
             }
         }
         

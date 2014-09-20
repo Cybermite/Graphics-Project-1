@@ -1,3 +1,6 @@
+// AUTHOR: ZANE RALSTON
+// DATE: SEPTEMBER 19, 2014
+// EMAIL: z641r311@ku.edu
 // ModelView.c++ - a basic combined Model and View for OpenGL
 
 #include <iostream>
@@ -192,11 +195,11 @@ GLint ModelView::pvAttribLocation(GLuint glslProgram, const std::string& name)
 
 void ModelView::render() const
 {    
-	// save the current GLSL program in use
+
 	GLint pgm;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &pgm);
 
-	// draw the triangles using our vertex and fragment shaders
+	// draw the triangles 
 	glUseProgram(shaderProgram);
 
 	float scaleTrans[4];
@@ -230,7 +233,7 @@ void ModelView::setMCRegionOfInterest(double xyz[6])
 
 void ModelView::defineGeometry(vec2* vertices) // num of vertices is a class variable
 {
-    // store the min and max for x and y, so we can use them in the fragment shader
+    // store the min and max for x and y
 	xmin = xmax = vertices[0][0];
 	ymin = ymax = vertices[0][1];
 	for (int i=1 ; i<numVertices ; i++)

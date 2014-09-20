@@ -1,3 +1,6 @@
+// AUTHOR: ZANE RALSTON
+// DATE: SEPTEMBER 19, 2014
+// EMAIL: z641r311@ku.edu
 // ModelView.h - a basic combined Model and View for OpenGL
 
 #ifndef MODELVIEW_H
@@ -32,7 +35,7 @@ public:
 
 private:
 	GLuint vao[1]; // VAO for the triangle
-	GLuint vbo[3]; // VBO - 0 for position, 1 for model view maxBounds, 2 for model view minBounds, and 3 for color
+	GLuint vbo[2]; // VBO - 0 for position and 2 for the local coords
     vec4* mvColor;
 	
 	// interactive display options
