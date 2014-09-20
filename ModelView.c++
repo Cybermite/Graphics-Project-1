@@ -14,6 +14,7 @@ GLint ModelView::ppuLoc_scaleTrans = -2;
 GLint ModelView::pvaLoc_mcPosition = -2; // attribute variable (per-vertex)
 GLint ModelView::ppuLoc_mvColor = -2; 
 GLint ModelView::pvaLoc_relPosition = -2;
+GLint ModelView::ppuLoc_disableCircle = -2;
 
 double ModelView::mcRegionOfInterest[6] = { -1.0, 1.0, -1.0, 1.0, -1.0, 1.0 };
 
@@ -21,14 +22,17 @@ static const int numVertices = 4;
 
 ModelView::ModelView(vec2* vertices, vec4 colors[]) : colorMode(0)
 {
-	if (ModelView::shaderProgram == 0)
+    if (ModelView::shaderProgram == 0)
 	{
 		// Create the common shader program:
 		ModelView::shaderIF = new ShaderIF("project1.vsh", "project1.fsh");
 		ModelView::shaderProgram = shaderIF->getShaderPgmID();
 		fetchGLSLVariableLocations();
 	}
-
+    for(int i = 0; i < 7; i++)
+    {
+        disableCircle[i] = 0;
+    }
     setColors(colors);
     defineGeometry(vertices);
 	ModelView::numInstances++;
@@ -118,6 +122,7 @@ void ModelView::fetchGLSLVariableLocations()
 		ModelView::pvaLoc_mcPosition = pvAttribLocation(shaderProgram, "mcPosition");
         ModelView::ppuLoc_mvColor = ppUniformLocation(shaderProgram, "userColors");
         ModelView::pvaLoc_relPosition = pvAttribLocation(shaderProgram, "relativePos");
+        ModelView::ppuLoc_disableCircle = ppUniformLocation(shaderProgram, "disableCircle");
     }
 }
 
@@ -141,9 +146,21 @@ void ModelView::handleCommand(unsigned char key, double ldsX, double ldsY)
     if((mcX > xmin) && (mcX < xmax) && (mcY > ymin) && (mcY < ymax))
     {
         if(key == 'c')
-        {
             colorMode = (colorMode + 1) % 3;
-        }
+        else if(key == '0')
+            disableCircle[0] = (disableCircle[0] + 1) % 2;
+        else if(key == '1')
+            disableCircle[1] = (disableCircle[1] + 1) % 2;
+        else if(key == '2')
+            disableCircle[2] = (disableCircle[2] + 1) % 2;
+        else if(key == '3')
+            disableCircle[3] = (disableCircle[3] + 1) % 2;
+        else if(key == '4')
+            disableCircle[4] = (disableCircle[4] + 1) % 2;
+        else if(key == '5')
+            disableCircle[5] = (disableCircle[5] + 1) % 2;
+        else if(key == '6')
+            disableCircle[6] = (disableCircle[6] + 1) % 2;
     }
 }
 
@@ -191,6 +208,9 @@ void ModelView::render() const
 	
     // set the currect color mode
 	glUniform1i(ModelView::ppuLoc_colorMode, colorMode);
+
+    // set the disabled circles
+    glUniform1iv(ModelView::ppuLoc_disableCircle, 7, disableCircle);
 
 	// bind the current triangle VAO
 	glBindVertexArray(vao[0]);

@@ -4,6 +4,7 @@ in vec2 mcPositionToFS;
 in vec2 relativePosToFS;
 uniform int colorMode;
 uniform vec4 userColors[5];
+uniform int disableCircle[7];
 
 // Replace the placeholder implementation here...
 
@@ -57,7 +58,11 @@ void main()
     {
         if(distance(center, relativePosToFS) <= radius)
         {
-            circleCount++;
+            // used to disable whether a circle gets counted.
+            if(disableCircle[i] < 1)
+            {
+                circleCount++;
+            }
         }
         
         center = vec2(origCenter.x + cos(radians)*radius, origCenter.y + sin(radians)*radius);

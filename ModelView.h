@@ -39,6 +39,7 @@ private:
 	int colorMode; // flag to tell fragment shader how to assign colors
 	bool visible; // i.e., whether we actually currently draw it
 	double xmin, xmax, ymin, ymax;
+    int disableCircle[7]; // should only be 0 or 1
 
 	// we assume all instances share the same shader program:
 	static ShaderIF* shaderIF;
@@ -52,6 +53,7 @@ private:
 	static GLint pvaLoc_mcPosition; // an attribute variable (per-vertex)
     static GLint ppuLoc_mvColor; // color to be used when coloring the circles
     static GLint pvaLoc_relPosition; // will be used for the local coord system for our model
+    static GLint ppuLoc_disableCircle; // used to disable a circle for if it's counted or not.
 
 	// "pp": "per-primitive"; "pv": "per-vertex"
 	static GLint ppUniformLocation(GLuint glslProgram, const std::string& name);
